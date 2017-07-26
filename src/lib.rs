@@ -18,8 +18,8 @@ impl ThreadPool {
         for _ in 0..thread_number {
             let (tx, rx): (mpsc::Sender<Next>, mpsc::Receiver<Next>) = mpsc::channel();
 
-            let (tx_to_parent, rx_from_child): (mpsc::Sender<()>, mpsc::Receiver<()>) =
-                mpsc::channel();
+            let (tx_to_parent, rx_from_child): (mpsc::Sender<JobDone>,
+                mpsc::Receiver<JobDone>) = mpsc::channel();
 
             pool.handles.push(PoolLink {
                 load: 0,
@@ -32,7 +32,7 @@ impl ThreadPool {
                             Next::Stop   => return,
                         }
 
-                        tx_to_parent.send(()).unwrap();
+                        tx_to_parent.send(JobDone).unwrap();
                     }
                 }),
             });
@@ -71,6 +71,8 @@ impl ThreadPool {
     }
 }
 
+struct JobDone;
+
 #[derive(Debug)]
 pub enum JoinAllProblem<T> {
     SendFailed(mpsc::SendError<T>),
@@ -98,7 +100,7 @@ impl fmt::Debug for Next {
 struct PoolLink {
     load: u32,
     sender: mpsc::Sender<Next>,
-    receiver: mpsc::Receiver<()>,
+    receiver: mpsc::Receiver<JobDone>,
     joiner: thread::JoinHandle<()>,
 }
 
