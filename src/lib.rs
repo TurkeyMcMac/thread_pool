@@ -88,7 +88,7 @@ use std::fmt;
 
 impl fmt::Debug for Next {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        write!(f, "thread_pool::Next::{}", match self {
+        write!(f, "{}", match self {
             &Next::Job(_) => "Job",
             &Next::Stop   => "Stop",
         })?;
