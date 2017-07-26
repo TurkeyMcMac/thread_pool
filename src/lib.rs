@@ -57,19 +57,42 @@ impl ThreadPool {
         Ok(())
     }
 
-    pub fn join_all(&mut self) -> Result<(), Box<std::error::Error>> {
+    pub fn join_all(&mut self) -> Result<(), JoinAllProblem<Next>> {
         for link in self.handles.drain(..) {
-            link.sender.send(Next::Stop)?;
-            link.joiner.join().unwrap();
+            if let Err(e) = link.sender.send(Next::Stop) {
+                 return Err(JoinAllProblem::SendFailed(e));
+            }
+            if let Err(e) = link.joiner.join() {
+                return Err(JoinAllProblem::JoinFailed(e));
+            }
         }
 
         Ok(())
     }
 }
 
+#[derive(Debug)]
+pub enum JoinAllProblem<T> {
+    SendFailed(mpsc::SendError<T>),
+    JoinFailed(Box<std::any::Any + Send + 'static>),
+}
+
 pub enum Next {
     Job(Box<FnBox() + Send + 'static>),
     Stop,
+}
+
+use std::fmt;
+
+impl fmt::Debug for Next {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        write!(f, "thread_pool::Next::{}", match self {
+            &Next::Job(_) => "Job",
+            &Next::Stop   => "Stop",
+        })?;
+
+        Ok(())
+    }
 }
 
 struct PoolLink {
