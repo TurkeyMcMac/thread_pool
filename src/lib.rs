@@ -57,7 +57,7 @@ impl ThreadPool {
         Ok(())
     }
 
-    pub fn join_all(&mut self) -> Result<(), JoinAllProblem<Next>> {
+    pub fn join_all(mut self) -> Result<(), JoinAllProblem<Next>> {
         for link in self.handles.drain(..) {
             if let Err(e) = link.sender.send(Next::Stop) {
                  return Err(JoinAllProblem::SendFailed(e));
