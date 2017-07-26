@@ -29,5 +29,5 @@ for i in 0..10 {
     })).unwrap();
 }
 
-pool.join_all();
+pool.join_all().unwrap();
 ```
