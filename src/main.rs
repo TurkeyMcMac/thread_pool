@@ -22,7 +22,7 @@ fn main() {
     thread::sleep(Duration::new(3, 0));
 
     for _ in 0..5 {
-        pool.give(Box::new(long_calculation)).unwrap();
+        pool.give(Box::new(|| { println!("Another function!"); })).unwrap();
     }
 
     pool.join_all().unwrap();
