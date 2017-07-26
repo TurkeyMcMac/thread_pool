@@ -12,6 +12,8 @@ their current jobs.
 
 #### Example
 ```
+extern crate thread_pool;
+
 use thread_pool::ThreadPool;
 
 use std::thread;
