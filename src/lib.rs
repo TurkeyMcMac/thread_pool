@@ -9,7 +9,7 @@ pub struct ThreadPool {
 }
 
 impl ThreadPool {
-    pub fn new(thread_number: usize) -> ThreadPool {
+    pub fn with(thread_number: usize) -> ThreadPool {
         assert!(thread_number > 0);
         let mut pool = ThreadPool {
             handles: Vec::with_capacity(thread_number),
