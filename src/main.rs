@@ -16,7 +16,7 @@ fn main() {
     let mut pool = ThreadPool::new(4);
 
     for _ in 0..15 {
-        pool.give(Box::new(long_calculation)).unwrap();
+        pool.assign(Box::new(long_calculation)).unwrap();
     }
 
     thread::sleep(Duration::new(3, 0));
@@ -24,7 +24,7 @@ fn main() {
 
     let data = Arc::new(Mutex::new(16));
     let cdata = data.clone();
-    pool.give(Box::new(move || {
+    pool.assign(Box::new(move || {
         let mut mdata = cdata.lock().unwrap();
         *mdata += 1;
     })).unwrap();

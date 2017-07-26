@@ -41,7 +41,7 @@ impl ThreadPool {
         pool
     }
 
-    pub fn give(&mut self, job: Box<FnBox() + Send + 'static>) -> Result<(), mpsc::SendError<Next>> {
+    pub fn assign(&mut self, job: Box<FnBox() + Send + 'static>) -> Result<(), mpsc::SendError<Next>> {
         for link in self.handles.iter_mut() {
             while let Ok(_) = link.receiver.try_recv() {
                 link.load -= 1;
