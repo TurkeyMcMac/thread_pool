@@ -7,8 +7,8 @@ experimental `FnBox`, which is in every other way equivalent to `FnOnce`, can.
 To instantiate a pool of threads, use `ThreadPool::new(number_of_threads)`. To
 give it something to compute, use `assign(Box::new(move some_function))`. The
 pool will automatically distribute work between all available threads.
-`join_all()` stops all  of a pool's threads after waiting for them to finish
-their current jobs.
+`join_all()` joins all  of a pool's threads after waiting for them to finish
+their current jobs, consuming the pool in the process.
 
 #### Example
 ```
