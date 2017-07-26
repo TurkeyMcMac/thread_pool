@@ -4,7 +4,7 @@ use thread_pool::ThreadPool;
 
 use std::thread;
 use std::time::Duration;
-
+use std::sync::{Arc, Mutex};
 
 fn main() {
     fn long_calculation() {
@@ -21,9 +21,14 @@ fn main() {
 
     thread::sleep(Duration::new(3, 0));
 
-    for _ in 0..5 {
-        pool.give(Box::new(|| { println!("Another function!"); })).unwrap();
-    }
+
+    let data = Arc::new(Mutex::new(16));
+    let cdata = data.clone();
+    pool.give(Box::new(move || {
+        let mut mdata = cdata.lock().unwrap();
+        *mdata += 1;
+    })).unwrap();
 
     pool.join_all().unwrap();
+    println!("data = {:?}", data);
 }

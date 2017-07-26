@@ -1,5 +1,8 @@
+#![feature(fnbox)]
+
 use std::sync::mpsc;
 use std::thread;
+use std::boxed::FnBox;
 
 pub struct ThreadPool {
     handles: Vec<PoolLink>,
@@ -38,7 +41,7 @@ impl ThreadPool {
         pool
     }
 
-    pub fn give(&mut self, job: Box<Fn() + Send + 'static>) -> Result<(), mpsc::SendError<Next>> {
+    pub fn give(&mut self, job: Box<FnBox() + Send + 'static>) -> Result<(), mpsc::SendError<Next>> {
         for link in self.handles.iter_mut() {
             while let Ok(_) = link.receiver.try_recv() {
                 link.load -= 1;
@@ -65,7 +68,7 @@ impl ThreadPool {
 }
 
 pub enum Next {
-    Job(Box<Fn() + Send + 'static>),
+    Job(Box<FnBox() + Send + 'static>),
     Stop,
 }
 
