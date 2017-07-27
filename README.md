@@ -22,11 +22,11 @@ use std::time::Duration;
 let pool = ThreadPool::with(4);
 
 for i in 0..10 {
-    pool.assign(Box::new(move || {
+    pool.assign(move || {
         println!("Starting calculation {}...", i);
         thread::sleep(Duration::new(2, 0));
         println!("Done with {}!", i);
-    })).unwrap();
+    }).unwrap();
 }
 
 pool.join_all().unwrap();

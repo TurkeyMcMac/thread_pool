@@ -4,6 +4,25 @@ use std::sync::mpsc;
 use std::thread;
 use std::boxed::FnBox;
 
+#[test]
+fn works() {
+    let mut pool = ThreadPool::with(2);
+
+    fn a_fn() {
+        println!("Foo");
+    }
+
+    fn another_fn() {
+        println!("Bar");
+    }
+
+    pool.assign(a_fn).unwrap();
+
+    pool.assign(another_fn).unwrap();
+
+    pool.join_all().unwrap();
+}
+
 pub struct ThreadPool {
     handles: Vec<PoolLink>,
 }
@@ -41,7 +60,10 @@ impl ThreadPool {
         pool
     }
 
-    pub fn assign(&mut self, job: Box<FnBox() + Send + 'static>) -> Result<(), mpsc::SendError<Next>> {
+    pub fn assign<T>(&mut self, job: T)
+        -> Result<(), mpsc::SendError<Next>>
+        where T: FnBox() + Send + 'static
+    {
         for link in self.handles.iter_mut() {
             while let Ok(_) = link.receiver.try_recv() {
                 link.load -= 1;
@@ -51,7 +73,7 @@ impl ThreadPool {
         self.handles.sort();
 
         let mut link: &mut PoolLink = &mut self.handles[0];
-        link.sender.send(Next::Job(job))?;
+        link.sender.send(Next::Job(Box::new(job)))?;
         link.load += 1;
 
         Ok(())
