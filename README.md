@@ -5,10 +5,10 @@ experimental `FnBox`, which is in every other way equivalent to `FnOnce`, can.
 
 ## Usage
 To instantiate a pool of threads, use `ThreadPool::new(number_of_threads)`. To
-give it something to compute, use `assign(Box::new(move some_function))`. The
-pool will automatically distribute work between all available threads.
-`join_all()` joins all  of a pool's threads after waiting for them to finish
-their current jobs, consuming the pool in the process.
+give it something to compute, use `assign(some_function)`. The pool will
+automatically distribute work between all available threads. `join_all()` joins
+all of a pool's threads after waiting for them to finish their current jobs,
+consuming the pool in the process.
 
 #### Example
 ```
@@ -19,7 +19,7 @@ use thread_pool::ThreadPool;
 use std::thread;
 use std::time::Duration;
 
-let pool = ThreadPool::with(4);
+let mut pool = ThreadPool::with(4);
 
 for i in 0..10 {
     pool.assign(move || {
