@@ -1,24 +1,23 @@
 #![feature(fnbox)]
 
+extern crate num_cpus;
+
+use std::boxed::FnBox;
 use std::sync::mpsc;
 use std::thread;
-use std::boxed::FnBox;
 
+use std::time::Duration;
 #[test]
 fn works() {
-    let mut pool = ThreadPool::with(2);
+    let mut pool = ThreadPool::new();
 
-    fn a_fn() {
-        println!("Foo");
+    for i in 0..10 {
+        pool.assign(move || {
+            println!("Starting calculation {}...", i);
+            thread::sleep(Duration::new(2, 0));
+            println!("Done with {}!", i);
+        }).unwrap();
     }
-
-    fn another_fn() {
-        println!("Bar");
-    }
-
-    pool.assign(a_fn).unwrap();
-
-    pool.assign(another_fn).unwrap();
 
     pool.join_all().unwrap();
 }
@@ -59,6 +58,8 @@ impl ThreadPool {
 
         pool
     }
+
+    pub fn new() -> ThreadPool { ThreadPool::with(num_cpus::get()) }
 
     pub fn assign<T>(&mut self, job: T)
         -> Result<(), mpsc::SendError<Next>>
