@@ -57,13 +57,13 @@ impl ThreadPool {
         Ok(())
     }
 
-    pub fn join_all(mut self) -> Result<(), JoinAllProblem<Next>> {
+    pub fn join_all(mut self) -> Result<(), JoinAllError<Next>> {
         for link in self.handles.drain(..) {
             if let Err(e) = link.sender.send(Next::Stop) {
-                 return Err(JoinAllProblem::SendFailed(e));
+                 return Err(JoinAllError::SendFailed(e));
             }
             if let Err(e) = link.joiner.join() {
-                return Err(JoinAllProblem::JoinFailed(e));
+                return Err(JoinAllError::JoinFailed(e));
             }
         }
 
@@ -74,7 +74,7 @@ impl ThreadPool {
 struct JobDone;
 
 #[derive(Debug)]
-pub enum JoinAllProblem<T> {
+pub enum JoinAllError<T> {
     SendFailed(mpsc::SendError<T>),
     JoinFailed(Box<std::any::Any + Send + 'static>),
 }
