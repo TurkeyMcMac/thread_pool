@@ -60,10 +60,10 @@ impl ThreadPool {
     pub fn join_all(mut self) -> Result<(), JoinAllError<Next>> {
         for link in self.handles.drain(..) {
             if let Err(e) = link.sender.send(Next::Stop) {
-                 return Err(JoinAllError::SendFailed(e));
+                 return Err(JoinAllError::SendError(e));
             }
             if let Err(e) = link.joiner.join() {
-                return Err(JoinAllError::JoinFailed(e));
+                return Err(JoinAllError::JoinError(e));
             }
         }
 
@@ -75,8 +75,8 @@ struct JobDone;
 
 #[derive(Debug)]
 pub enum JoinAllError<T> {
-    SendFailed(mpsc::SendError<T>),
-    JoinFailed(Box<std::any::Any + Send + 'static>),
+    SendError(mpsc::SendError<T>),
+    JoinError(Box<std::any::Any + Send + 'static>),
 }
 
 pub enum Next {
