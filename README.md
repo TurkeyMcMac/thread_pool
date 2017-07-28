@@ -1,14 +1,11 @@
 # Thread Pool
-I am learning Rust, and this seemed like a fun project. Nightly Rust is required
-because, as of now, `FnOnce` cannot be called from inside a `Box`, but the
-experimental `FnBox`, which is in every other way equivalent to `FnOnce`, can.
+I am learning Rust, and this seemed like a fun project. Nightly Rust is required because, as of now, `FnOnce` cannot be called from inside a `Box`, but the experimental `FnBox`, which is in every other way equivalent to `FnOnce`, can.
 
 ## Usage
-To instantiate a pool of threads, use `ThreadPool::new(number_of_threads)`. To
-give it something to compute, use `assign(some_function)`. The pool will
-automatically distribute work between all available threads. `join_all()` joins
-all of a pool's threads after waiting for them to finish their current jobs,
-consuming the pool in the process.
+`ThreadPool::with(thread_number)` Creates a pool with the specified thread number. Panics if the number given is less than one.
+`ThreadPool::new()` Creates a thread pool that uses up the rest of the computer's available CPUs.
+`thread_pool.assign(some_function)` Give a thread pool a `FnBox` to compute.
+`thread_pool.join_all()` Join all of a thread pool's threads with the current one. Returns an error if panic(s) have occurred.
 
 #### Example
 ```
@@ -26,7 +23,7 @@ for i in 0..10 {
         println!("Starting calculation {}...", i);
         thread::sleep(Duration::new(2, 0));
         println!("Done with {}!", i);
-    }).unwrap();
+    });
 }
 
 pool.join_all().unwrap();
