@@ -1,5 +1,5 @@
 # Thread Pool
-I am learning Rust, and this seemed like a fun project. The first version did not use mutexes, and was a bit messier. When I came to the chapter in the Rust Book on creating a thread pool, mutexes were used, and I realized that they would be better than my current solution. Still, the rest is my own design.
+I am learning Rust, and this seemed like a fun project. The first version did not use mutexes, and was a bit messier. When I came to the chapter on creating a thread pool in the [Rust introductory book](https://doc.rust-lang.org/book/second-edition/), mutexes were used, and I realized that they would be better than my current solution. Still, the rest is my own design.
 
 ## Usage
 `ThreadPool::with(thread_number)` Creates a pool with the specified thread number. Panics if the number given is less than one.  
