@@ -11,7 +11,7 @@ use std::thread::JoinHandle;
 use std::time::Duration;
 #[test]
 fn works() {
-    let mut pool = ThreadPool::new();
+    let pool = ThreadPool::new();
 
     for i in 0..10 {
         pool.assign(move || {
@@ -46,13 +46,13 @@ impl ThreadPool {
 
     pub fn new() -> ThreadPool { ThreadPool::with(num_cpus::get()) }
 
-    pub fn assign<T>(&mut self, job: T)
+    pub fn assign<T>(&self, job: T)
         where T: FnBox() + Send + 'static
     {
         self.task_queue.lock().unwrap().push_back(Task::Job(Box::new(job)));
     }
 
-    pub fn join_all(mut self) -> thread::Result<()> {
+    pub fn join_all(self) -> thread::Result<()> {
         for _ in 0..self.join_handles.len() {
             match self.task_queue.lock() {
                 Ok(v)  => v,
@@ -60,7 +60,7 @@ impl ThreadPool {
             }.push_back(Task::Terminate);
         }
 
-        for join_handle in self.join_handles.drain(..) {
+        for join_handle in self.join_handles.into_iter() {
             join_handle.join()?;
         }
 

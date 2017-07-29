@@ -17,7 +17,7 @@ use thread_pool::ThreadPool;
 use std::thread;
 use std::time::Duration;
 
-let mut pool = ThreadPool::with(4);
+let pool = ThreadPool::with(4);
 
 for i in 0..10 {
     pool.assign(move || {
